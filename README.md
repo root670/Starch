@@ -1,3 +1,5 @@
+# Starch
+
 A minimal Arch Linux distribution for running StepMania on dedicated rhythm game
 machines.
 
