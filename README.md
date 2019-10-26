@@ -47,9 +47,9 @@ sh install.sh
   user will be used in the future.
 * Terminal can be accessed by holding `Alt` and pressing `F2` through `F7`.
 * IO boards for pads and/or lights (PIUIO, P4IO, LitBoard, MiniMaid, etc.)
-  aren't supported out-of-the-box. If you're able to get any IO boards (PIUIO,
-  P4IO, LitBoard, MiniMaid, etc.) working with Starch, please let me know and
-  I'll look into adding support for it in the installation script.
+  aren't supported out-of-the-box. If you're able to get any IO boards working
+  with Starch, please let me know and I'll look into adding support for it in
+  the installation script.
 * If using in an SD cabinet with a CRT monitor, you'll need to create a custom X
   config script similar to how ITG does.
 
