@@ -43,15 +43,17 @@ sh install.sh
 
 ## Notes
 
-* Currently everything is run as root on the installed system. A locked down user will be used in the future.
-
+* Currently everything is run as root on the installed system. A locked down
+  user will be used in the future.
 * Terminal can be accessed by holding `Alt` and pressing `F2` through `F7`.
+* IO boards for pads and/or lights (PIUIO, P4IO, LitBoard, MiniMaid, etc.)
+  aren't supported out-of-the-box. If you're able to get any IO boards (PIUIO,
+  P4IO, LitBoard, MiniMaid, etc.) working with Starch, please let me know and
+  I'll look into adding support for it in the installation script.
+* If using in an SD cabinet with a CRT monitor, you'll need to create a custom X
+  config script similar to how ITG does.
 
 ## Disclaimer
 
-This has been tested in VirtualBox and on my own desktop, but **not in a
-dedicated cabinet**. It lacks support for stage IO or light IO boards as I don't
-have access to these for testing. If you are able to get any sort of IO working
-(PIUIO, P4IO, etc.), please let me know and I'll look into adding support for it
-in the installation script. If using with a CRT monitor in an SD cabinet, you
-will need to create a custom X config script similar to how ITG does.
+**Use at your own risk!** This has been tested in VirtualBox and on my own
+desktop, but **not in an actual cabinet**.
