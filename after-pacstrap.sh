@@ -32,7 +32,7 @@ configure_settings() {
 
     # Set initial configuration for StepMania
     mkdir -p ~/.stepmania-5.1/Save
-    cat <<EOF >> ~/.stepmania-5.1/Save/Static.ini
+    cat <<EOF >> /opt/.stepmania-5.1/Data/Static.ini
 [Options]
 Windowed=0
 EOF
