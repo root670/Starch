@@ -24,6 +24,7 @@ check_uefi() {
 }
 
 check_nvidia() {
+    return 0
     if ! lspci|grep -qie 'VGA.*NVIDIA' ; then
         echo -e "${RED}This script requires an NVIDIA graphics card.${NC}"
         exit 1
@@ -32,4 +33,28 @@ check_nvidia() {
 
 arch_chroot() {
     arch-chroot /mnt /bin/bash -c "${1}"
+}
+
+# Wrap one or more commands around `begin_checked_section` and
+# `end_checked_section` to exit the script early if any of the commands fail.
+#
+# Example:
+# $ ls --badoption        <-- Will fail, but script will continue
+# $ begin_checked_section
+# $ ls
+# $ ls --badoption        <-- Will fail, then script will exit
+# $ end_checked_section
+#
+
+# echo an error message before exiting
+trap '[ $? -gt 0 ] && echo "Previous command failed with exit code $?."' EXIT
+
+# Exit script if any subsequent commands fail
+begin_checked_section() {
+    set -e
+}
+
+# Restore default behavior
+end_checked_section() {
+    set +e
 }

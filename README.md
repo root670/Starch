@@ -38,7 +38,7 @@ machines.
 wget github.com/root670/Starch/archive/master.zip
 bsdtar -xf master.zip
 cd Starch-master
-sh install.sh
+bash install.sh
 ```
 
 ## Notes

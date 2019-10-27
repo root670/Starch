@@ -14,6 +14,7 @@ else
     echo -e "${RED}Couldn't detect CPU vendor.${NC}"
     exit 1
 fi
+readonly UUID_PATH='/uuid.tmp'
 
 # Change these variables as needed
 readonly KEYMAP='us'
