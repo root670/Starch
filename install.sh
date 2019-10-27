@@ -165,8 +165,8 @@ configure_startup() {
     echo -e "${GREEN}Doing final configuration${NC}"
 
     # Set initial configuration for StepMania
-    arch_chroot "mkdir -p ~/.stepmania/Data"
-    arch_chroot "cat <<EOF >> ~/.stepmania-5.1/Data/Static.ini
+    arch_chroot "mkdir -p ~/.stepmania-5.1/Save"
+    arch_chroot "cat <<EOF >> ~/.stepmania-5.1/Save/Static.ini
 [Options]
 Windowed=0
 EOF"
@@ -196,7 +196,7 @@ EOF'
     # Start X after login on tty1
     arch_chroot 'cat <<EOF > ~/.bash_profile
 if [[ -z \$DISPLAY ]] && [[ \$(tty) = /dev/tty1 ]]; then
-    startx
+    startx -- -nocursor
 fi
 EOF'
 }
