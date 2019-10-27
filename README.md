@@ -25,10 +25,10 @@ machines.
 2. Boot from installation media using the UEFI boot partition. You may need to
    disable secure boot if it's currently enabled.
 
-3. Ensure you have a working Internet connection once the terminal prompt
-   appears. For wired connections, a connection should be established
-   automatically using DHCP. For wireless connections, `wifi-menu` can be used
-   to connect to a network. The
+3. Ensure you have a working Internet connection once the terminal appears. For
+   wired connections, a connection should be established automatically using
+   DHCP. For wireless connections, `wifi-menu` can be used to connect to a
+   network. The
    [ArchWiki](https://wiki.archlinux.org/index.php/Network_configuration)
    provides more detailed instructions if needed.
 
@@ -37,7 +37,7 @@ machines.
 ```
 wget github.com/root670/Starch/archive/master.zip
 bsdtar -xf master.zip
-cd Starch
+cd Starch-master
 sh install.sh
 ```
 
