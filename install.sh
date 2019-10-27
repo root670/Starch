@@ -1,58 +1,10 @@
 #!/bin/bash
 
-PACMAN_OPTIONS='--noconfirm --color always'
-GREEN='\e[32m\e[1m'
-RED='\e[31m\e[1m'
-NC='\e[0m'
-if cat /proc/cpuinfo|grep -qie 'vendor.*Intel' ; then
-    CPU_VENDOR='intel'
-elif cat /proc/cpuinfo|grep -qie 'vendor.*AMD' ; then
-    CPU_VENDOR='amd'
-else
-    echo -e "${RED}Couldn't detect CPU vendor.${NC}"
-    exit 1
-fi
+source constants.sh
+source helpers.sh
 
-# Change these variables as needed
-KEYMAP='us'
-LANG='en_US.UTF-8'
-TIMEZONE='US/Pacific'
-
-#
-# Helper Functions
-#
-check_root() {
-    if ((EUID)); then
-        echo -e "${RED}This script must be run as root.${NC}"
-        exit 1
-    fi
-}
-
-check_internet_connection() {
-    if ! wget -q --spider https://google.com ; then
-        echo -e "${RED}Not connected to the Internet.${NC}"
-        exit 1
-    fi
-}
-
-check_uefi() {
-    if ! [ -d /sys/firmware/efi ] ; then
-        echo -e "${RED}This script requires the system to boot in UEFI mode.${NC}"
-        exit 1
-    fi
-}
-
-check_nvidia() {
-    if ! lspci|grep -qie 'VGA.*NVIDIA' ; then
-        echo -e "${RED}This script requires an NVIDIA graphics card.${NC}"
-        exit 1
-    fi
-}
-
-arch_chroot() {
-    arch-chroot /mnt /bin/bash -c "${1}"
-}
-
+# Global variables used within this script
+DEVICE=
 
 #
 # Main Functions
@@ -68,35 +20,35 @@ disk_setup() {
         options+=("$blk" "$name")
     done
     IFS=' '
-    device=$(whiptail --menu "Choose device to install the OS to" 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3)
+    DEVICE=$(whiptail --menu "Choose device to install the OS to" 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3)
     if [ "$?" = "0" ]; then
-        if (whiptail --yesno "Are you sure you want to use $device? All contents will be destroyed!" --defaultno 0 0) then
+        if (whiptail --yesno "Are you sure you want to use $DEVICE? All contents will be destroyed!" --defaultno 0 0) then
             clear
             echo -e "${GREEN}Creating partitions${NC}"
-            parted --script $device -- mklabel gpt \
+            parted --script $DEVICE -- mklabel gpt \
                 mkpart primary fat32 64d 512MiB  \
                 set 1 esp on \
                 mkpart primary ext4 512MiB -1MiB
 
             # Change device name if using NVMe
-            if [ "${device::8}" == "/dev/nvm" ]; then device=${device}"p"; fi
+            if [ "${DEVICE::8}" == "/dev/nvm" ]; then DEVICE+="p"; fi
 
             # Wait for udev to create device nodes for the new partitions
-            while [ ! -b ${device}"1" ]; do sleep 1; done
-            while [ ! -b ${device}"2" ]; do sleep 1; done
+            while [ ! -b ${DEVICE}"1" ]; do sleep 1; done
+            while [ ! -b ${DEVICE}"2" ]; do sleep 1; done
 
-            mkfs.vfat -F32 ${device}"1"
-            mkfs.ext4 -F ${device}"2"
+            mkfs.vfat -F32 ${DEVICE}"1"
+            mkfs.ext4 -F ${DEVICE}"2"
 
-            mount ${device}2 /mnt
+            mount ${DEVICE}2 /mnt
             mkdir /mnt/boot
-            mount ${device}1 /mnt/boot
+            mount ${DEVICE}1 /mnt/boot
         else
-            echo -e "Installation canceled.${NC}"
+            echo Installation canceled.
             exit 0
         fi
     else
-        echo -e "Installation canceled.${NC}"
+        echo Installation canceled.
         exit 0
     fi
 }
@@ -114,7 +66,7 @@ package_setup() {
 bootloader_setup() {
     echo -e "${GREEN}Setting up bootloader${NC}"
     arch_chroot "bootctl install"
-    local uuid=$(blkid ${device}2|awk '{print $5}')
+    local uuid=$(blkid ${DEVICE}2|awk '{print $5}')
     arch_chroot "cat <<EOF > /boot/loader/loader.conf
 timeout 0
 default arch
