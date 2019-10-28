@@ -56,7 +56,7 @@ EOF
     cat <<EOF > /etc/systemd/system/getty@tty1.service.d/override.conf
 [Service]
 ExecStart=
-ExecStart=-/usr/bin/agetty --autologin root --noclear %I \$TERM
+ExecStart=-/usr/bin/agetty --skip-login --nonewline --noissue --autologin root --noclear %I \$TERM
 EOF
 
     # Start X after login on tty1
@@ -78,23 +78,6 @@ locale_setup() {
     echo "${LANG} UTF-8" >> /etc/locale.gen
     echo "LANG=${LANG}" >> /etc/locale.conf
     locale-gen
-}
-
-bootloader_setup() {
-    echo -e "${GREEN}Setting up bootloader${NC}"
-    bootctl install
-    local uuid=$(cat $UUID_PATH)
-    cat <<EOF > /boot/loader/loader.conf
-timeout 0
-default arch
-EOF
-    cat <<EOF > /boot/loader/entries/arch.conf
-title ArchLinux
-linux /vmlinuz-linux
-initrd ${CPU_VENDOR}-ucode.img
-initrd /initramfs-linux.img
-options root=${uuid} rw nvidia-drm.modeset=1
-EOF
 }
 
 initramfs_setup() {
@@ -128,6 +111,23 @@ Exec=/bin/sh -c 'while read -r trg; do case $trg in linux) exit 0; esac; done; /
 EOF
 }
 
+bootloader_setup() {
+    echo -e "${GREEN}Setting up bootloader${NC}"
+    bootctl install
+    local uuid=$(cat $UUID_PATH)
+    cat <<EOF > /boot/loader/loader.conf
+timeout 0
+default arch
+EOF
+    cat <<EOF > /boot/loader/entries/arch.conf
+title ArchLinux
+linux /vmlinuz-linux
+initrd ${CPU_VENDOR}-ucode.img
+initrd /initramfs-linux.img
+options root=${uuid} rw nvidia-drm.modeset=1 quiet
+EOF
+}
+
 cleanup() {
     rm -rf /var/cache/pacman/pkg
     touch /tmp/success
@@ -137,5 +137,6 @@ build_stepmania
 configure_settings
 timezone_setup
 locale_setup
+initramfs_setup
 bootloader_setup
 cleanup
