@@ -24,7 +24,6 @@ check_uefi() {
 }
 
 check_nvidia() {
-    return 0
     if ! lspci|grep -qie 'VGA.*NVIDIA' ; then
         echo -e "${RED}This script requires an NVIDIA graphics card.${NC}"
         exit 1
