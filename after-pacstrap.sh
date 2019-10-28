@@ -31,8 +31,8 @@ configure_settings() {
     echo -e "${GREEN}Setting up configuration files${NC}"
 
     # Set initial configuration for StepMania
-    mkdir -p ~/.stepmania-5.1/Save
-    cat <<EOF >> /opt/.stepmania-5.1/Data/Static.ini
+    mkdir -p /opt/stepmania-5.1/Data
+    cat <<EOF >> /opt/stepmania-5.1/Data/Static.ini
 [Options]
 Windowed=0
 EOF
@@ -93,6 +93,7 @@ initramfs_setup() {
     mkinitcpio -p linux
 
     # If the nvidia or linux packages are updated, rebuild initramfs again
+    mkdir -p /etc/pacman.d/hooks
     cat <<EOF > /etc/pacman.d/hooks/nvidia.hook
 [Trigger]
 Operation=Install
