@@ -52,6 +52,9 @@ bash install.sh
 * Currently everything is run as root on the installed system. A locked down
   user will be used in the future.
 * Terminal can be accessed by holding `Ctrl+Alt` and pressing `F2` through `F7`.
+* To connect to the network using DHCP, run `systemctl start dhcpcd.service` to
+  start the DHCP client service. `systemctl enable dhcpcd.service` will cause
+  the service to start automatically on every boot.
 
 ## Disclaimer
 
