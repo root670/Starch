@@ -93,7 +93,7 @@ title ArchLinux
 linux /vmlinuz-linux
 initrd ${CPU_VENDOR}-ucode.img
 initrd /initramfs-linux.img
-options root=${uuid} rw
+options root=${uuid} rw nvidia-drm.modeset=1
 EOF
 }
 
@@ -101,7 +101,31 @@ initramfs_setup() {
     # Compress with lz4
     echo COMPRESSION=\"lz4\" >> /etc/mkinitcpio.conf
     echo COMPRESSION_OPTIONS=\"-9\" >> /etc/mkinitcpio.conf
-    sed -i -e "s/MODULES=(\(.*\))/MODULES=(\1 lz4 lz4_compress)/" /etc/mkinitcpi.conf
+    sed -i -e "s/^MODULES=(\(.*\))/MODULES=(\1 lz4 lz4_compress)/" /etc/mkinitcpio.conf
+
+    # Enable NVIDIA DRM kernel mode setting
+    sed -i -e "s/^MODULES=(\(.*\))/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm \1)/" /etc/mkinitcpio.conf
+
+    # Rebuild initramfs
+    mkinitcpio -p linux
+
+    # If the nvidia or linux packages are updated, rebuild initramfs again
+    cat <<EOF > /etc/pacman.d/hooks/nvidia.hook
+[Trigger]
+Operation=Install
+Operation=Upgrade
+Operation=Remove
+Type=Package
+Target=nvidia
+Target=linux
+
+[Action]
+Description=Update Nvidia module in initcpio
+Depends=mkinitcpio
+When=PostTransaction
+NeedsTargets
+Exec=/bin/sh -c 'while read -r trg; do case $trg in linux) exit 0; esac; done; /usr/bin/mkinitcpio -P'
+EOF
 }
 
 cleanup() {
