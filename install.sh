@@ -64,7 +64,8 @@ package_setup() {
     echo -e "${GREEN}Installing packages${NC}"
     pacstrap /mnt base linux base-devel glew libmad libjpeg libxinerama \
         libpulse libpng libvorbis libxrandr libva mesa cmake git yasm \
-        xorg-xinit xorg-server vim dhcpcd alsa-utils nvidia ${CPU_VENDOR}-ucode
+        xorg-xinit xorg-server vim dhcpcd alsa-utils nvidia \
+        ${CPU_VENDOR}-ucode lz4
     end_checked_section
 }
 

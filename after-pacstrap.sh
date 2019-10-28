@@ -28,7 +28,7 @@ build_stepmania() {
 }
 
 configure_settings() {
-    echo -e "${GREEN}Doing final configuration${NC}"
+    echo -e "${GREEN}Setting up configuration files${NC}"
 
     # Set initial configuration for StepMania
     mkdir -p ~/.stepmania-5.1/Save
@@ -95,6 +95,13 @@ initrd ${CPU_VENDOR}-ucode.img
 initrd /initramfs-linux.img
 options root=${uuid} rw
 EOF
+}
+
+initramfs_setup() {
+    # Compress with lz4
+    echo COMPRESSION=\"lz4\" >> /etc/mkinitcpio.conf
+    echo COMPRESSION_OPTIONS=\"-9\" >> /etc/mkinitcpio.conf
+    sed -i -e "s/MODULES=(\(.*\))/MODULES=(\1 lz4 lz4_compress)/" /etc/mkinitcpi.conf
 }
 
 cleanup() {
