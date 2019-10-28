@@ -65,6 +65,9 @@ if [[ -z \$DISPLAY ]] && [[ \$(tty) = /dev/tty1 ]]; then
     startx -- -nocursor
 fi
 EOF
+
+    # Disable `Last login...` message
+    touch ~/.hushlogin
 }
 
 timezone_setup() {
