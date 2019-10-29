@@ -62,7 +62,7 @@ EOF
     # Start X after login on tty1
     cat <<EOF > ~/.bash_profile
 if [[ -z \$DISPLAY ]] && [[ \$(tty) = /dev/tty1 ]]; then
-    startx -- -nocursor
+    startx -- -nocursor &>/dev/null
 fi
 EOF
 
