@@ -126,12 +126,16 @@ bootloader_setup() {
 timeout 0
 default arch
 EOF
+
+    # options:
+    # - nvidia-drm.modeset=1: Enable KMS in NVIDIA driver
+    # - quiet rd.udev.log_priority=3: Disable most messages from appearing
     cat <<EOF > /boot/loader/entries/arch.conf
 title ArchLinux
 linux /vmlinuz-linux
 initrd ${CPU_VENDOR}-ucode.img
 initrd /initramfs-linux.img
-options root=${uuid} rw nvidia-drm.modeset=1 quiet
+options root=${uuid} rw nvidia-drm.modeset=1 quiet rd.udev.log_priority=3
 EOF
 }
 
