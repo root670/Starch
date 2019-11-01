@@ -137,6 +137,17 @@ initrd ${CPU_VENDOR}-ucode.img
 initrd /initramfs-linux.img
 options root=${uuid} rw nvidia-drm.modeset=1 quiet rd.udev.log_priority=3
 EOF
+
+    # Hack to remove the "SHA256 Validated" message from appearing at every
+    # boot by replacing the call to `Print()` with nops. This will only be
+    # used with systemd-boot 243.78-1-arch, verified by the checksum below.
+    local checksum="b562dceb4622989ecfbb52acdabd804470f47d7acf4e45687bede7fb33926938"
+    if [[ "$(sha256sum /boot/EFI/BOOT/BOOTX64.EFI)" -eq "$checksum" ]]; then
+        echo -ne "\x90\x90\x90\x90\x90" > dd of=/boot/EFI/BOOT/BOOTX64.EFI bs=1 seek=40320 count=5 conv=notrunc
+    fi
+    if [[ "$(sha256sum /boot/EFI/BOOT/BOOTX64.EFI)" -eq "$checksum" ]]; then
+        echo -ne "\x90\x90\x90\x90\x90" > dd of=/boot/EFI/systemd/systemd-bootx64.efi bs=1 seek=40320 count=5 conv=notrunc
+    fi
 }
 
 cleanup() {
