@@ -92,6 +92,9 @@ initramfs_setup() {
     # Enable NVIDIA DRM kernel mode setting
     sed -i -e "s/^MODULES=(\(.*\))/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm \1)/" /etc/mkinitcpio.conf
 
+    # Replace udev with systemd
+    sed -i -e "s/HOOKS=(\(.*\)\(udev\)/HOOKS=(\1systemd/" /etc/mkinitcpio.conf
+
     # Rebuild initramfs
     mkinitcpio -p linux
 
