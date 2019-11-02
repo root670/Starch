@@ -89,14 +89,9 @@ initramfs_setup() {
     echo COMPRESSION_OPTIONS=\"-9\" >> /etc/mkinitcpio.conf
     sed -i -e "s/^MODULES=(\(.*\))/MODULES=(\1 lz4 lz4_compress)/" /etc/mkinitcpio.conf
 
+    if has_nvidia_gpu; then
     # Enable NVIDIA DRM kernel mode setting
     sed -i -e "s/^MODULES=(\(.*\))/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm \1)/" /etc/mkinitcpio.conf
-
-    # Replace udev with systemd
-    sed -i -e "s/HOOKS=(\(.*\)\(udev\)/HOOKS=(\1systemd/" /etc/mkinitcpio.conf
-
-    # Rebuild initramfs
-    mkinitcpio -p linux
 
     # If the nvidia or linux packages are updated, rebuild initramfs again
     mkdir -p /etc/pacman.d/hooks
@@ -116,6 +111,13 @@ When=PostTransaction
 NeedsTargets
 Exec=/bin/sh -c 'while read -r trg; do case $trg in linux) exit 0; esac; done; /usr/bin/mkinitcpio -P'
 EOF
+    fi
+
+    # Replace udev with systemd
+    sed -i -e "s/HOOKS=(\(.*\)\(udev\)/HOOKS=(\1systemd/" /etc/mkinitcpio.conf
+
+    # Rebuild initramfs
+    mkinitcpio -p linux
 }
 
 bootloader_setup() {
@@ -130,12 +132,16 @@ EOF
     # options:
     # - nvidia-drm.modeset=1: Enable KMS in NVIDIA driver
     # - quiet rd.udev.log_priority=3: Disable most messages from appearing
+    if has_nvidia_gpu; then
+        local nvidia_drm="nvidia-drm.modeset=1"
+    fi
+
     cat <<EOF > /boot/loader/entries/arch.conf
 title ArchLinux
 linux /vmlinuz-linux
 initrd ${CPU_VENDOR}-ucode.img
 initrd /initramfs-linux.img
-options root=${uuid} rw nvidia-drm.modeset=1 quiet rd.udev.log_priority=3
+options root=${uuid} rw ${nvidia_drm} quiet rd.udev.log_priority=3
 EOF
 
     # Hack to remove the "SHA256 Validated" message from appearing at every

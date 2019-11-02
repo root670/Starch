@@ -66,6 +66,12 @@ package_setup() {
         libpulse libpng libvorbis libxrandr libva mesa cmake git yasm \
         xorg-xinit xorg-server vim dhcpcd alsa-utils nvidia \
         ${CPU_VENDOR}-ucode lz4
+
+    if has_nvidia_gpu; then
+        echo -e "${GREEN}Installing NVIDIA driver${NC}"
+        pacstrap /mnt nvidia
+    fi
+
     end_checked_section
 }
 
@@ -90,7 +96,6 @@ after_pacstrap() {
 }
 
 check_root
-check_nvidia
 check_internet_connection
 
 disk_setup

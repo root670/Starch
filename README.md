@@ -8,12 +8,10 @@ cabinets.
 * Unattended installation. You only need to specify a device to install to
 * Boots to StepMania running in its own X session without a desktop environment
 * Downloads and compiles latest StepMania revision from GitHub
-* Uses latest NVIDIA driver
+* Uses proprietary NVIDIA driver if an NVIDIA graphics card is installed
 
 ## System Requirements
 
-* 64-bit CPU
-* NVIDIA GeForce 600 or newer graphics card
 * System capable of booting in UEFI mode
 * Internet connection at time of installation
 
