@@ -57,11 +57,9 @@ disk_setup() {
 }
 
 package_setup() {
-    echo -e "${GREEN}Refreshing package list${NC}"
-    begin_checked_section
-    pacman $PACMAN_OPTIONS -Syy
-
     echo -e "${GREEN}Installing packages${NC}"
+    begin_checked_section
+
     pacstrap /mnt base linux base-devel glew libmad libjpeg libxinerama \
         libpulse libpng libvorbis libxrandr libva mesa cmake git yasm \
         xorg-xinit xorg-server vim dhcpcd alsa-utils ${CPU_VENDOR}-ucode lz4
