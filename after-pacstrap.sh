@@ -90,12 +90,12 @@ initramfs_setup() {
     sed -i -e "s/^MODULES=(\(.*\))/MODULES=(\1 lz4 lz4_compress)/" /etc/mkinitcpio.conf
 
     if has_nvidia_gpu; then
-    # Enable NVIDIA DRM kernel mode setting
-    sed -i -e "s/^MODULES=(\(.*\))/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm \1)/" /etc/mkinitcpio.conf
+        # Enable NVIDIA DRM kernel mode setting
+        sed -i -e "s/^MODULES=(\(.*\))/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm \1)/" /etc/mkinitcpio.conf
 
-    # If the nvidia or linux packages are updated, rebuild initramfs again
-    mkdir -p /etc/pacman.d/hooks
-    cat <<EOF > /etc/pacman.d/hooks/nvidia.hook
+        # If the nvidia or linux packages are updated, rebuild initramfs again
+        mkdir -p /etc/pacman.d/hooks
+        cat <<EOF > /etc/pacman.d/hooks/nvidia.hook
 [Trigger]
 Operation=Install
 Operation=Upgrade
@@ -151,7 +151,7 @@ EOF
     if [[ "$(sha256sum /boot/EFI/BOOT/BOOTX64.EFI | cut -d' ' -f1)" == "$checksum" ]]; then
         echo -ne "\x90\x90\x90\x90\x90" | dd of=/boot/EFI/BOOT/BOOTX64.EFI bs=1 seek=40320 count=5 conv=notrunc
     fi
-    if [[ "$(sha256sum /boot/EFI/BOOT/BOOTX64.EFI | cut -d' ' -f1)" == "$checksum" ]]; then
+    if [[ "$(sha256sum /boot/EFI/systemd/systemd-bootx64.efi | cut -d' ' -f1)" == "$checksum" ]]; then
         echo -ne "\x90\x90\x90\x90\x90" | dd of=/boot/EFI/systemd/systemd-bootx64.efi bs=1 seek=40320 count=5 conv=notrunc
     fi
 }
