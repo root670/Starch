@@ -92,6 +92,17 @@ after_pacstrap() {
     fi
 }
 
+finished() {
+    whiptail 
+    choice=$(whiptail --menu "Installation completed! What do you want to do now?" 0 0 0 "Reboot" "Reboot the machine" "Return in Shell" "Return to archiso with installation mounted to /mnt" 3>&1 1>&2 2>&3)
+    if [[ $? -eq 0 ]]; then
+        case "$choice" in
+            "Reboot") umount -R /mnt &>/dev/null; reboot ;;
+            *) clear; exit 0 ;;
+        esac
+    fi
+}
+
 check_root
 check_internet_connection
 
@@ -100,4 +111,4 @@ package_setup
 fstab_setup
 after_pacstrap
 
-umount -R /mnt &>/dev/null
+finished
