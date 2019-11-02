@@ -1,7 +1,7 @@
 # Starch
 
-A minimal Arch Linux distribution for running StepMania on dedicated rhythm game
-machines.
+A minimal Arch Linux installation for running StepMania on dedicated arcade
+cabinets.
 
 ## Features
 
@@ -12,6 +12,7 @@ machines.
 
 ## System Requirements
 
+* 64-bit CPU
 * NVIDIA GeForce 600 or newer graphics card
 * System capable of booting in UEFI mode
 * Internet connection at time of installation
