@@ -24,7 +24,8 @@ check_uefi() {
 }
 
 has_nvidia_gpu() {
-    return lspci | grep -qie "VGA.*NVIDIA"
+    lspci | grep -qie "VGA.*NVIDIA"
+    return $?
 }
 
 arch_chroot() {
