@@ -8,8 +8,18 @@
 source constants.sh
 source helpers.sh
 
+PASSWORD=
+
+user_setup() {
+    echo -e "${GREEN}Creating new user${NC}"
+    useradd -m -G wheel $USERNAME
+    echo ${USERNAME}:${PASSWORD} | chpasswd -e
+}
+
 build_stepmania() {
     echo -e "${GREEN}Building StepMania${NC}"
+    begin_checked_section
+
     git clone --depth=1 https://github.com/stepmania/stepmania.git /stepmania
     mkdir /stepmania/build
     pushd /stepmania
@@ -25,10 +35,14 @@ build_stepmania() {
     cmake --install build --strip
     popd
     rm -rf /stepmania
+    chown -R ${USERNAME}:${USERNAME} /opt/stepmania-5.1/
+
+    end_checked_section
 }
 
 configure_settings() {
     echo -e "${GREEN}Setting up configuration files${NC}"
+    begin_checked_section
 
     # Set initial configuration for StepMania
     mkdir -p /opt/stepmania-5.1/Data
@@ -36,9 +50,10 @@ configure_settings() {
 [Options]
 Windowed=0
 EOF
+    chown ${USERNAME}:${USERNAME} /opt/stepmania-5.1/Data/Static.ini
 
     # Run stepmania when `startx` is run
-    cat <<EOF > ~/.xinitrc
+    cat <<EOF > /home/${USERNAME}/.xinitrc
 #!/bin/sh
 
 if [ -d /etc/X11/xinit/xinitrc.d ]; then
@@ -50,24 +65,29 @@ fi
 
 exec /opt/stepmania-5.1/stepmania
 EOF
+    chown ${USERNAME}:${USERNAME} /home/${USERNAME}/.xinitrc
 
     # Automatically login as root
     mkdir -p /etc/systemd/system/getty@tty1.service.d
     cat <<EOF > /etc/systemd/system/getty@tty1.service.d/override.conf
 [Service]
 ExecStart=
-ExecStart=-/usr/bin/agetty --skip-login --nonewline --noissue --autologin root --noclear %I \$TERM
+ExecStart=-/usr/bin/agetty --skip-login --nonewline --noissue --autologin $USERNAME --noclear %I \$TERM
 EOF
 
     # Start X after login on tty1
-    cat <<EOF > ~/.bash_profile
+    cat <<EOF > /home/${USERNAME}/.bash_profile
 if [[ -z \$DISPLAY ]] && [[ \$(tty) = /dev/tty1 ]]; then
     startx -- -nocursor &>/dev/null
 fi
 EOF
+    chown ${USERNAME}:${USERNAME} /home/${USERNAME}/.bash_profile
 
     # Disable `Last login...` message
-    touch ~/.hushlogin
+    touch /home/${USERNAME}/.hushlogin
+    chown ${USERNAME}:${USERNAME} /home/${USERNAME}/.hushlogin
+
+    end_checked_section
 }
 
 timezone_setup() {
@@ -84,6 +104,9 @@ locale_setup() {
 }
 
 initramfs_setup() {
+    echo -e "${GREEN}Rebuilding initramfs${NC}"
+    begin_checked_section
+
     # Compress with lz4
     echo COMPRESSION=\"lz4\" >> /etc/mkinitcpio.conf
     echo COMPRESSION_OPTIONS=\"-9\" >> /etc/mkinitcpio.conf
@@ -118,10 +141,14 @@ EOF
 
     # Rebuild initramfs
     mkinitcpio -p linux
+
+    end_checked_section
 }
 
 bootloader_setup() {
     echo -e "${GREEN}Setting up bootloader${NC}"
+    begin_checked_section
+
     bootctl install
     local uuid=$(cat $UUID_PATH)
     cat <<EOF > /boot/loader/loader.conf
@@ -154,13 +181,26 @@ EOF
     if [[ "$(sha256sum /boot/EFI/systemd/systemd-bootx64.efi | cut -d' ' -f1)" == "$checksum" ]]; then
         echo -ne "\x90\x90\x90\x90\x90" | dd of=/boot/EFI/systemd/systemd-bootx64.efi bs=1 seek=40320 count=5 conv=notrunc
     fi
+
+    end_checked_section
 }
 
 cleanup() {
+    echo -e "${GREEN}Cleaning up${NC}"
     rm -rf /var/cache/pacman/pkg
     touch /tmp/success
 }
 
+# Parse arguments
+while [[ "$1" != "" ]]; do
+    case $1 in
+        --password ) shift; PASSWORD=$1 ;;
+        * ) echo "Invalid argument \"$1\""; exit 1 ;;
+    esac
+    shift
+done
+
+user_setup
 build_stepmania
 configure_settings
 timezone_setup

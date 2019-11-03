@@ -15,6 +15,7 @@ else
     exit 1
 fi
 readonly UUID_PATH='/uuid.tmp'
+readonly USERNAME='stepmania'
 
 # Change these variables as needed
 readonly KEYMAP='us'

@@ -32,6 +32,11 @@ arch_chroot() {
     arch-chroot /mnt /bin/bash -c "${1}"
 }
 
+installation_canceled() {
+    echo -e "${RED}Installation canceled.${NC}"
+    exit 1
+}
+
 # Wrap one or more commands around `begin_checked_section` and
 # `end_checked_section` to exit the script early if any of the commands fail.
 #

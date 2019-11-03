@@ -3,10 +3,26 @@
 source constants.sh
 source helpers.sh
 
+PASSWORD= # Set by user_setup()
 
 #
 # Main Functions
 #
+user_setup() {
+    password1=$(whiptail --passwordbox "Enter password for user 'stepmania':" 8 50 3>&1 1>&2 2>&3)
+    if ! [[ "$?" == "0" ]]; then installation_canceled; fi
+
+    password2=$(whiptail --passwordbox "Confirm password:" 8 50 3>&1 1>&2 2>&3)
+    if ! [[ "$?" == "0" ]]; then installation_canceled; fi
+
+    if [[ "$password1" == "$password2" ]]; then
+        PASSWORD=$(openssl passwd -6 "$password1")
+        return 0
+    else
+        whiptail --msgbox "Passwords do not match, try again." 0 0
+        user_setup # Prompt again.
+    fi
+}
 disk_setup() {
     umount -R /mnt &>/dev/null
     local drive_list=$(lsblk -dnlpo NAME,MODEL -e 7,11)
@@ -51,8 +67,7 @@ disk_setup() {
             exit 0
         fi
     else
-        echo Installation canceled.
-        exit 0
+        installation_canceled
     fi
 }
 
@@ -83,7 +98,7 @@ after_pacstrap() {
     begin_checked_section
     mkdir -p /mnt/after-pacstrap
     cp after-pacstrap.sh constants.sh helpers.sh /mnt/after-pacstrap
-    arch-chroot /mnt bash -c "cd /after-pacstrap && source after-pacstrap.sh"
+    arch-chroot /mnt bash -c "cd /after-pacstrap && bash after-pacstrap.sh --password '$PASSWORD'"
     rm -rf /mnt/after-pacstrap
     end_checked_section
 
@@ -106,6 +121,7 @@ finished() {
 check_root
 check_internet_connection
 
+user_setup
 disk_setup
 package_setup
 fstab_setup
