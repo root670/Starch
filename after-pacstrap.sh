@@ -176,14 +176,24 @@ EOF
 
     # Hack to remove the "SHA256 Validated" message from appearing at every
     # boot by replacing the call to `Print()` with nops. This will only be
-    # used with systemd-boot 243.78-1-arch, verified by the checksum below.
-    local checksum="b562dceb4622989ecfbb52acdabd804470f47d7acf4e45687bede7fb33926938"
-    if [[ "$(sha256sum /boot/EFI/BOOT/BOOTX64.EFI | cut -d' ' -f1)" == "$checksum" ]]; then
-        echo -ne "\x90\x90\x90\x90\x90" | dd of=/boot/EFI/BOOT/BOOTX64.EFI bs=1 seek=40320 count=5 conv=notrunc
-    fi
-    if [[ "$(sha256sum /boot/EFI/systemd/systemd-bootx64.efi | cut -d' ' -f1)" == "$checksum" ]]; then
-        echo -ne "\x90\x90\x90\x90\x90" | dd of=/boot/EFI/systemd/systemd-bootx64.efi bs=1 seek=40320 count=5 conv=notrunc
-    fi
+    # applied to versions matching the following checksums:
+    local checksums=(
+        # 243.78-1
+        "b562dceb4622989ecfbb52acdabd804470f47d7acf4e45687bede7fb33926938"
+        # 243.78-2
+        "9e50bb64f1adf79ae73c8e171287e92ff3cb462237743eb94a02a0286591028a"
+    )
+    local filenames=(
+        "/boot/EFI/BOOT/BOOTX64.EFI"
+        "/boot/EFI/systemd/systemd-bootx64.efi"
+    )
+    local patch="\x90\x90\x90\x90\x90"
+    for checksum in "${checksums[@]}"; do for filename in "${filenames[@]}"; do
+        if [[ "$(sha256sum ${filename} | cut -d' ' -f1)" == "$checksum" ]]; then
+            echo -ne $patch | \
+                dd of=${filename} bs=1 seek=40320 count=5 conv=notrunc
+        fi
+    done; done
 
     end_checked_section
 }
