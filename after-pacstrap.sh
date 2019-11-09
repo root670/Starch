@@ -14,6 +14,9 @@ user_setup() {
     echo -e "${GREEN}Creating new user${NC}"
     useradd -m -G wheel $USERNAME
     echo ${USERNAME}:${PASSWORD} | chpasswd -e
+
+    # Allow members of wheel group to use sudo
+    echo "%wheel ALL=(ALL) ALL" >> /etc/sudoers
 }
 
 build_stepmania() {
@@ -67,7 +70,7 @@ exec /opt/stepmania-5.1/stepmania
 EOF
     chown ${USERNAME}:${USERNAME} /home/${USERNAME}/.xinitrc
 
-    # Automatically login as root
+    # Automatically login as user
     mkdir -p /etc/systemd/system/getty@tty1.service.d
     cat <<EOF > /etc/systemd/system/getty@tty1.service.d/override.conf
 [Service]
