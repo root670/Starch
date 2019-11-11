@@ -75,9 +75,7 @@ package_setup() {
     echo -e "${GREEN}Installing packages${NC}"
     begin_checked_section
 
-    pacstrap /mnt base linux base-devel glew libmad libjpeg libxinerama \
-        libpulse libpng libvorbis libxrandr libva mesa cmake git yasm \
-        xorg-xinit xorg-server vim dhcpcd alsa-utils ${CPU_VENDOR}-ucode lz4
+    pacstrap /mnt base $PACKAGES_STANDARD ${CPU_VENDOR}-ucode
 
     if has_nvidia_gpu; then
         echo -e "${GREEN}Installing NVIDIA driver${NC}"

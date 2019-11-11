@@ -21,3 +21,9 @@ readonly USERNAME='stepmania'
 readonly KEYMAP='us'
 readonly LANG='en_US.UTF-8'
 readonly TIMEZONE='US/Pacific'
+
+# Packages that will always be installed on the system
+readonly PACKAGES_STANDARD='base linux base-devel glew libmad libjpeg libxinerama libpulse libpng libvorbis libxrandr libva mesa cmake git yasm xorg-xinit xorg-server vim dhcpcd alsa-utils lz4'
+# Packages that may be installed depending on the hardware in use, but need to
+# be included in the ISO image
+readonly PACKAGES_ISO='amd-ucode intel-ucode nvidia'
