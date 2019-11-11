@@ -48,8 +48,6 @@ bash install.sh
   the installation script.
 * If using in an SD cabinet with a CRT monitor, you'll need to create a custom X
   config script similar to how ITG does.
-* Currently everything is run as root on the installed system. A locked down
-  user will be used in the future.
 * Terminal can be accessed by holding `Ctrl+Alt` and pressing `F2` through `F7`.
 * To connect to the network using DHCP, run `systemctl start dhcpcd.service` to
   start the DHCP client service. `systemctl enable dhcpcd.service` will cause
